@@ -38,8 +38,8 @@ public class HashFun<T1, T2> extends HashRel<T1, T2> implements Function<T1, T2>
 	 * @param c2     	any collection
 	 * @throws IllegalArgumentException if the collections do not contain the same number of unique elements
 	**/
-    public HashFun(Collection c1, Collection c2) {
-    	Set s = new HashSet(c1);
+    public HashFun(Collection<T1> c1, Collection<T2> c2) {
+    	Set<T1> s = new HashSet<>(c1);
         if (s.size() != c2.size()) throw new IllegalArgumentException("The number of unique elements in c1 must equal the number of elements in c2");
 		super.buildRelation(s,c2);
     }
@@ -49,21 +49,21 @@ public class HashFun<T1, T2> extends HashRel<T1, T2> implements Function<T1, T2>
 	 * of maplets.
 	 * @throws ClassCastException if the collection does not contain maplets
 	**/
-	public HashFun(Collection c) {
+	public HashFun(Collection<Maplet<T1, T2>> c) {
 		super(c);
 	}
 
     /**
      * Constructs a function from a given <code>java.util.Map</code>.
     **/
-	public HashFun(Map m) {
+	public HashFun(Map<T1, T2> m) {
 		super(m);
 	}
 
    /**
      * Constructs a function from a given function.
     **/	
-	public HashFun(Function f) {
+	public HashFun(Function<T1, T2> f) {
 		super(f);
 	}
 	
@@ -92,9 +92,8 @@ public class HashFun<T1, T2> extends HashRel<T1, T2> implements Function<T1, T2>
 	 * @return <code>true</code> if the maplet was added to this function
 	 * @throws DuplicateKeyException if the maplet already exists
 	**/
-	@Override
     public boolean add(Maplet<T1, T2> m) {
-        Maplet throwAway = this.getMaplet((T1) m.x());
+        Maplet<T1, T2> throwAway = this.getMaplet(m.x());
         if (throwAway != null) throw new RuntimeException("Duplicate Key"); //DuplicateKeyException();
         return super.add(m);
     }
@@ -151,8 +150,8 @@ public class HashFun<T1, T2> extends HashRel<T1, T2> implements Function<T1, T2>
      * 
     **/
     public Maplet<T1, T2> getMaplet(T1 key) {
-        for (Iterator iter = super.iterator(); iter.hasNext();) {
-            Maplet<T1, T2> m = (Maplet<T1, T2>)iter.next();
+        for (Iterator<Maplet<T1, T2>> iter = super.iterator(); iter.hasNext();) {
+            Maplet<T1, T2> m = iter.next();
             if (m.x().equals(key)) return m;
         }
         //if (lambda!=null) return new Maplet<K, V>(key, (V)lambda.expression(key));

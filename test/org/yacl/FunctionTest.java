@@ -226,6 +226,5 @@ public class FunctionTest extends TestCase {
         actual = q.union(r);
         assertEquals(actual.size(),6);
         assertTrue(actual instanceof Relation);
-        
     }
 }

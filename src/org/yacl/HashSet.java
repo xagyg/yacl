@@ -8,7 +8,7 @@ import java.util.Collection;
 
  @author Brad Long
 **/
-public class HashSet<T> extends java.util.HashSet implements Set<T> {
+public class HashSet<T> extends java.util.HashSet<T> implements Set<T> {
 	
 	public HashSet() {
 		super();
@@ -26,10 +26,11 @@ public class HashSet<T> extends java.util.HashSet implements Set<T> {
     }
     
     public Set<T> addElement(T el) {
-        Set s = getInstance();
+        Set<T> s = getInstance();
         s.add(el);
         return s;
     }
+
 
     /**
      * Constructs the union of a given set with this set.
@@ -41,11 +42,11 @@ public class HashSet<T> extends java.util.HashSet implements Set<T> {
 	 * @see java.util.Set#addAll(Collection c)
     **/
     public Set<T> union (Set<T> t) {
-        Set s = getInstance();
+        Set<T> s = getInstance();
         s.addAll(this);
         s.addAll(t);
         return s;
-    }        
+    }
     
     /**
      * Returns the difference of a given set with this set.
@@ -106,10 +107,10 @@ public class HashSet<T> extends java.util.HashSet implements Set<T> {
      * @return the identity <code>Relation</code> for this set
     **/
     public Relation<T, T> identity () {
-        Relation<T, T> r = new HashRel<T, T>();
+        Relation<T, T> r = new HashRel<>();
         int i=0;
         for (Object[] o = toArray(); i<o.length; ++i) {
-            Maplet m = new Maplet(o[i], o[i]);
+            Maplet<T, T> m = new Maplet<T, T>((T)o[i], (T)o[i]);
             r.add(m);
         }
         return r;
@@ -120,13 +121,13 @@ public class HashSet<T> extends java.util.HashSet implements Set<T> {
      * @param y the set Y in X x Y 
      * @return the cartesian product of this set and the given set.
     **/
-    public Relation cartesianProduct(Set y) {
-        Relation r = new HashRel();
+    public Relation<T, T> cartesianProduct(Set<T> y) {
+        Relation<T, T> r = new HashRel<T, T>();
         int i=0;
         for (Object[] o = toArray(); i < o.length; ++i) {
             int j=0;
             for (Object[] o2 = y.toArray(); j < o2.length; ++j) {
-                r.add(new Maplet(o[i],o2[j]));
+                r.add(new Maplet<T, T>((T)o[i],(T)o2[j]));
             }
         }
         return r;

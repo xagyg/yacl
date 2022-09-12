@@ -1,5 +1,6 @@
 package org.yacl;
 
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -60,7 +61,37 @@ public interface Relation<T1, T2> extends Set<Maplet<T1, T2>> {
     **/   
     public boolean addAll(Map<T1, T2> m);
 
+    /**
+     * Overrides <code>add</code> in <code>Set</code> to ensure only
+     * maplets are added.
+     *
+     * @param m        the maplet to be added
+     * @return <code>true</code> if the object was added to this relation
+     * @throws ClassCastException if the object is not a <code>Maplet</code>
+     **/
+    public boolean add(Maplet<T1, T2> m);
+
+    /**
+     * Overrides <code>add</code> in <code>Set</code> to ensure only
+     * maplets are added.
+     *
+     * @param t1        the x-value of the maplet to be added
+     * @param t2        the y-value of the maplet to be added
+     * @return <code>true</code> if the object was added to this relation
+     * @throws ClassCastException if the object is not a <code>Maplet</code>
+     **/
     public boolean add(T1 t1, T2 t2);
+
+    /**
+     * Constructs the union of a given set with this relation.
+     * The members of <code>R.union(S)</code> are those objects which are members of
+     * <code>R</code> or <code>S</code> or both.
+     *
+     * @param s        the set to union with this relation
+     * @return  a relation being the union of <code>this</code> and <code>s</code>
+     * @see java.util.Set#addAll(Collection c)
+     **/
+    public Relation<T1, T2> union (Set<Maplet<T1, T2>> s);
 
     /**
      * Returns a relation being only those maplets in this relation whose x in (x,y) appear

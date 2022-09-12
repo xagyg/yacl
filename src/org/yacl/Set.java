@@ -6,7 +6,7 @@ package org.yacl;
 
  @author Brad Long
 **/
-public interface Set<T> extends java.util.Set {
+public interface Set<T> extends java.util.Set<T> {
 	
 	public Set<T> addElement(T element);
 

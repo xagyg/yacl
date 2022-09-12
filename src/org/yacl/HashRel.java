@@ -49,16 +49,16 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
 	 * @param y 	any collection
 	 * @throws IllegalArgumentException if the collections are not the same size
 	**/
-    public HashRel(Collection x, Collection y) {
+    public HashRel(Collection<T1> x, Collection<T2> y) {
 		buildRelation(x, y);
     }
     
-    protected void buildRelation(Collection x, Collection y) {
+    protected void buildRelation(Collection<T1> x, Collection<T2> y) {
         if (x.size() != y.size()) throw new IllegalArgumentException("Collections must be the same size");
-        Iterator xi = x.iterator();
-        Iterator yi = y.iterator();
+        Iterator<T1> xi = x.iterator();
+        Iterator<T2> yi = y.iterator();
         while (xi.hasNext()) {
-            Maplet<T1, T2> maplet = new Maplet<T1, T2>((T1)xi.next(), (T2)yi.next());
+            Maplet<T1, T2> maplet = new Maplet<>((T1)xi.next(), (T2)yi.next());
             super.add(maplet);
         }    	
     }
@@ -66,14 +66,14 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
     /**
      * Constructs a relation from a given <code>java.util.Collection</code>.
     **/
-    public HashRel(Collection c) {
+    public HashRel(Collection<Maplet<T1, T2>> c) {
         this.addAll(c);
     }
 
     /**
      * Constructs a relation from a given <code>java.util.Map</code>.
     **/
-    public HashRel(Map m) {
+    public HashRel(Map<T1, T2> m) {
         this.addAll(m);
     }
     
@@ -97,7 +97,7 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
         Set<T1> domain = new HashSet<T1>();
         int i=0;
         for (Object[] o = this.toArray(); i < o.length; ++i) {
-            Maplet m = (Maplet) o[i];
+            Maplet<T1, T2> m = (Maplet<T1, T2>) o[i];
             domain.add(m.x());
         }
         return domain;
@@ -113,28 +113,51 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
         Set<T2> range = new HashSet<T2>();
         int i=0;
         for (Object[] o = this.toArray(); i < o.length; ++i) {
-            Maplet m = (Maplet) o[i];
+            Maplet<T1, T2> m = (Maplet<T1, T2>) o[i];
             range.add(m.y());
         }
         return range;
     }
-    
+
+    /**
+     * Constructs the union of a given set with this relation.
+     * The members of <code>R.union(S)</code> are those objects which are members of
+     * <code>R</code> or <code>S</code> or both.
+     *
+     * @param s        the set to union with this relation
+     * @return  a relation being the union of <code>this</code> and <code>s</code>
+     * @see java.util.Set#addAll(Collection c)
+     **/
+    public Relation<T1, T2> union (Set<Maplet<T1, T2>> s) {
+        Relation<T1, T2> r = getInstance();
+        r.addAll(this);
+        r.addAll(s);
+        return r;
+    }
+
     /**
      * Overrides <code>add</code> in <code>Set</code> to ensure only
      * maplets are added.
-     * 
+     *
+     * @param m        the maplet to be added
      * @return <code>true</code> if the object was added to this relation
      * @throws ClassCastException if the object is not a <code>Maplet</code>
     **/
-
-
     public boolean add(Maplet<T1, T2> m) {
- //   	if (!(t instanceof Maplet)) throw new ClassCastException("Only maplets can be added to a relation.");
     	return super.add(m);
     }
 
+    /**
+     * Overrides <code>add</code> in <code>Set</code> to ensure only
+     * maplets are added.
+     *
+     * @param t1        the x-value of the maplet to be added
+     * @param t2        the y-value of the maplet to be added
+     * @return <code>true</code> if the object was added to this relation
+     * @throws ClassCastException if the object is not a <code>Maplet</code>
+     **/
     public boolean add(T1 t1, T2 t2) {
-        return add(new Maplet(t1, t2));
+        return add(new Maplet<>(t1, t2));
     }
     
     /**
@@ -144,11 +167,11 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
      * @return <code>true</code> if any objects of the collection were added to this relation
      * @throws ClassCastException if any element is not a maplet
     **/
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends Maplet<T1, T2>> c) {
         boolean changed = false;
         Object[] o = c.toArray();
-        for (int i=0; i<o.length; ++i) {
-            changed = this.add(o[i]) || changed;
+        for (Object value : o) {
+            changed = this.add((Maplet<T1, T2>) value) || changed;
         }
         return changed;
     }
@@ -161,8 +184,8 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
     public boolean addAll(Map<T1,T2> m) {
     	boolean changed = false;
         Object[] o = m.keySet().toArray();
-        for (int i=0; i<o.length; ++i) {
-            changed = this.add(new Maplet<T1, T2>((T1)o[i], (T2)m.get(o[i]))) || changed;
+        for (Object key : o) {
+            changed = this.add(new Maplet<T1, T2>((T1) key, (T2) m.get(key))) || changed;
         }
         return changed;
     }    
@@ -178,10 +201,9 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
     **/ 
     public Relation<T1, T2> domainRestriction (Set<T1> s) {
         Relation<T1, T2> r = new HashRel<>();
-        for (Iterator i1 = this.iterator(); i1.hasNext();) {
-            Maplet<T1, T2> m = (Maplet)i1.next();
-            for (Iterator i2 = s.iterator(); i2.hasNext();) {
-                if (m.x().equals(i2.next())) r.add(m);
+        for (Maplet<T1, T2> m : this) {
+            for (T1 t1 : s) {
+                if (m.x().equals(t1)) r.add(m);
             }
         }
         return r;
@@ -202,11 +224,10 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
     **/
     public Relation<T1, T2> domainAntiRestriction (Set<T1> s) {
         Relation<T1, T2> r = new HashRel<>();
-        for (Iterator i1 = this.iterator(); i1.hasNext();) {
-            Maplet<T1, T2> m = (Maplet)i1.next();
+        for (Maplet<T1, T2> m : this) {
             boolean match = false;
-            for (Iterator i2 = s.iterator(); i2.hasNext();) {
-                if (m.x().equals(i2.next())) match = true;
+            for (T1 t1 : s) {
+                if (m.x().equals(t1)) match = true;
             }
             if (!match) r.add(m);
         }
@@ -224,10 +245,9 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
     **/
     public Relation<T1, T2> rangeRestriction (Set<T2> t) {
         Relation<T1, T2> r = new HashRel<>();
-        for (Iterator i1 = this.iterator(); i1.hasNext();) {
-            Maplet<T1, T2> m = (Maplet)i1.next();
-            for (Iterator i2 = t.iterator(); i2.hasNext();) {
-                if (m.y().equals(i2.next())) r.add(m);
+        for (Maplet<T1, T2> m : this) {
+            for (T2 t2 : t) {
+                if (m.y().equals(t2)) r.add(m);
             }
         }
         return r;
@@ -248,12 +268,11 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
      * 
     **/
     public Relation<T1, T2> rangeAntiRestriction (Set<T2> t) {
-        Relation<T1, T2> r = new HashRel<T1, T2>();
-        for (Iterator i1 = this.iterator(); i1.hasNext();) {
-            Maplet<T1, T2> m = (Maplet)i1.next();
+        Relation<T1, T2> r = new HashRel<>();
+        for (Maplet<T1, T2> m : this) {
             boolean match = false;
-            for (Iterator i2 = t.iterator(); i2.hasNext();) {
-                if (m.y().equals(i2.next())) match = true;
+            for (T2 t2 : t) {
+                if (m.y().equals(t2)) match = true;
             }
             if (!match) r.add(m);
         }
@@ -268,10 +287,10 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
      * 
     **/
     public Relation<T2, T1> inverse() {
-        Relation<T2, T1> r = new HashRel<T2, T1>();
+        Relation<T2, T1> r = new HashRel<>();
         int i=0;
         for (Object[] o = this.toArray(); i < o.length; ++i) {
-            Maplet<T1, T2> m = (Maplet) o[i];
+            Maplet<T1, T2> m = (Maplet<T1, T2>) o[i];
             Maplet<T2, T1> n = new Maplet<>(m.y(), m.x());
             r.add(n);
         }
@@ -292,10 +311,10 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
         Relation<T1, T2> rel = new HashRel<T1, T2>();
         int i=0;        
         for (Object[] o = this.toArray(); i < o.length; ++i) {
-            Maplet<T1, T2> m1 = (Maplet) o[i];
+            Maplet<T1, T2> m1 = (Maplet<T1, T2>) o[i];
             int j=0;
             for (Object[] o2 = r.toArray(); j<o2.length; ++j) {
-                Maplet<T1, T2> m2 = (Maplet) o2[j];
+                Maplet<T1, T2> m2 = (Maplet<T1, T2>) o2[j];
                 if (m1.y().equals(m2.x())) {
                     Maplet<T1, T2> m = new Maplet<>(m1.x(), m2.y());
                     rel.add(m);
@@ -337,7 +356,7 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
      * @return a relation being the transitive closure of this relation
     **/
     public Relation<T1, T2> transitiveClosure () {
-        Relation<T1, T2> rel = new HashRel<T1, T2>(this);
+        Relation<T1, T2> rel = new HashRel<>(this);
         int s = 0, t = 0;
         do {
             Relation<T1, T2> r = new HashRel<>(rel);
@@ -384,8 +403,8 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
      * are at least related to themselves in the range of this relation.
     **/
     public boolean isReflexive () {
-        Set dom = this.domain();
-        Relation<T1, T2> r = new HashRel<>(dom, dom);
+        Set<T1> dom = this.domain();
+        Relation<T1, T2> r = new HashRel<T1, T2>(dom, (Set<T2>)dom);
         return r.isSubsetOf(this);
     }
     
@@ -396,7 +415,7 @@ public class HashRel<T1, T2> extends HashSet<Maplet<T1,T2>> implements Relation<
         String str = "[";
         Object[] o = toArray();
         for (int i=0; i<o.length; ++i) {
-            Maplet m = (Maplet) o[i];
+            Maplet<T1, T2> m = (Maplet<T1, T2>) o[i];
             str = str + (i==0?"":", ") + m.x() + "->" + m.y();
         }
         str = str + "]";

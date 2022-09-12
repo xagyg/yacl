@@ -38,6 +38,16 @@ public interface Function<K, V> extends Relation<K, V> {
 	**/
     public V put(K key, V value);
 
+	/**
+	 * Adds a maplet to this function. An exception is thrown
+	 * if a maplet already exists with the same x
+	 * in (x,y).
+	 *
+	 * @param m    the maplet to add to the function
+	 * @return <code>true</code> if the maplet was added to this function
+	 * @throws DuplicateKeyException if the maplet already exists
+	 **/
+
 	public boolean add(Maplet<K, V> m);
     
     /**

@@ -74,6 +74,57 @@ public class RelationTest extends TestCase {
         assertTrue(r.inverse().equals(q));
      
     }
+
+    public void testReflexivity() {
+        Relation r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("tom","kim"));
+        assertFalse(r.isReflexive());
+        r = new HashRel();
+        r.add(new Maplet("tom","tom"));
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("tom","kim"));
+        assertFalse(r.isReflexive());
+        r = new HashRel();
+        r.add(new Maplet("tom","tom"));
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","fred"));
+        r.add(new Maplet("tom","kim"));
+        assertTrue(r.isReflexive());
+    }
+
+    public void testFunction() {
+        Relation r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("tom","kim"));
+        assertFalse(r.isFunction());
+        r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("alice","mary"));
+        assertTrue(r.isFunction());
+    }
+
+    public void testInjection() {
+        Relation r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("tom","kim"));
+        assertFalse(r.isInjection());
+        r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("alice","mary"));
+        assertFalse(r.isInjection());
+        r = new HashRel();
+        r.add(new Maplet("tom","jane"));
+        r.add(new Maplet("fred","mary"));
+        r.add(new Maplet("alice","fred"));
+        assertTrue(r.isInjection());
+    }
     
     public void testCompose() {
  
@@ -183,7 +234,7 @@ public class RelationTest extends TestCase {
         assertTrue(((Relation)r.domainRestriction(new HashSet().addElement("tom")).union(q)).rangeRestriction(new HashSet().addElement("car")).contains(new Maplet("jane","car")));
     }
 
-/******
+
     public void testCasting() {
         Relation q = new HashRel();
         q.add("larry","jane");
@@ -196,23 +247,22 @@ public class RelationTest extends TestCase {
         r.add("tom","kim");
         
         Set s = new HashSet();
-        s.add("jack");
-        s.add("ron");
+        s.add(new Maplet("jack", "jill"));
+       // s.add("ron");
         
-        //Set actual = r.union(s);
-        //assertEquals(actual.size(),5);
-        //assertTrue(actual instanceof Set);
-       //assertFalse(actual instanceof Relation); 
-    
-        Set actual = s.union(r);
-        assertEquals(actual.size(),5);
+        Set actual = r.union(s);
+        assertEquals(actual.size(),4);
         assertTrue(actual instanceof Set);
-        assertFalse(actual instanceof Relation); 
+        assertTrue(actual instanceof Relation);
+    
+        actual = s.union(r);
+        assertEquals(actual.size(),4);
+        assertTrue(actual instanceof Set);
+        assertFalse(actual instanceof Relation);
         
         actual = q.union(r);
         assertEquals(actual.size(),6);
         assertTrue(actual instanceof Relation);
-        
     }
-**/
+
 }
