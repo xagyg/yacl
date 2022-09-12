@@ -1,0 +1,72 @@
+<project name="z" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="test" location="test"/>
+  <property name="build" location="build"/>
+  <property name="build.src" location="build/src"/>
+  <property name="build.test" location="build/test"/>
+  <property name="dist"  location="dist"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build.src}"/>
+    <mkdir dir="${build.test}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build.src}"/>
+    <javac srcdir="${test}" classpath="${build.src};${test}/junit.jar" destdir="${build.test}"/>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything in ${build} into the yacl.jar file -->
+    <jar jarfile="${dist}/yacl.jar" basedir="${build.src}"/>
+  </target>
+  
+  <target name="test" depends="compile">
+    <java classname="org.yacl.AllTest" classpath="${build.src};${build.test};${test}/junit.jar"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+  
+  <target name="doc">
+    <delete dir="docs/api"/>
+    <javadoc
+           destdir="docs/api"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="YACL Collections Library">
+
+    <packageset dir="src" defaultexcludes="yes"/>
+    <doctitle><![CDATA[<h1>YACL Collections Library</h1>]]></doctitle>
+    <bottom><![CDATA[<i>Copyright &#169; 2006-2009 Brad Long. All Rights Reserved.</i>]]></bottom>
+<!--
+    <tag name="todo" scope="all" description="To do:"/>
+    <group title="Group 1 Packages" packages="com.dummy.test.a*"/>
+    <group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/>
+    <link offline="true" href="http://java.sun.com/products/jdk/1.2/docs/api/" packagelistLoc="C:\tmp"/>
+    <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+-->
+    <link href="http://java.sun.com/javase/6/docs/api/"/>
+    </javadoc>
+  </target>
+  
+</project>
